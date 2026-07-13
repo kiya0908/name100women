@@ -1,0 +1,13 @@
+export const SITE_NAME = "Name 100 Women";
+export const SITE_URL = "https://name100women.top";
+export const SUPPORT_EMAIL = "support@name100women.top";
+export const GAME_TARGET = 100;
+export const NORMALIZATION_VERSION = "v1";
+export const MAX_NAME_LENGTH = 100;
+export const EXTERNAL_TIMEOUT_MS = 4_000;
+export const RATE_LIMIT_PER_MINUTE = 30;
+export const VISITOR_COOKIE = "n100w_visitor";
+export const VISITOR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+export const NEGATIVE_CACHE_TTL_SECONDS = 60 * 60 * 12;
+export const PERSON_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
+export const ALIAS_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;

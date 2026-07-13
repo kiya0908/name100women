@@ -1,0 +1,11 @@
+declare module "react-router" {
+  interface AppLoadContext {
+    cloudflare: {
+      env: Env;
+      ctx: ExecutionContext;
+      cf?: IncomingRequestCfProperties;
+    };
+  }
+}
+
+export {};
