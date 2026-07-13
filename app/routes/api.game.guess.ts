@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 
+import { cloudflareContext } from "~/context";
 import { methodNotAllowed, jsonResponse, readJson } from "~/shared/http";
 import { guessRequestSchema } from "~/shared/schemas";
 import type { GuessStatus } from "~/shared/types";
@@ -26,7 +27,8 @@ export async function action({
       );
     }
 
-    const result = await new GameService(context.cloudflare.env).guess(
+    const { env } = context.get(cloudflareContext);
+    const result = await new GameService(env).guess(
       parsed.data.sessionId,
       parsed.data.name,
     );
