@@ -13,10 +13,10 @@ import {
 } from "react-router";
 
 import "./app.css";
-import "./context";
 
 import { SiteFooter } from "./components/SiteFooter";
 import { SiteHeader } from "./components/SiteHeader";
+import { cloudflareContext } from "./context";
 
 export const meta: MetaFunction = () => [
   { title: "Name 100 Women" },
@@ -28,9 +28,10 @@ export const meta: MetaFunction = () => [
 ];
 
 export function loader({ context }: LoaderFunctionArgs) {
+  const { env } = context.get(cloudflareContext);
   return {
-    ga4Id: context.cloudflare.env.GA4_ID ?? null,
-    clarityId: context.cloudflare.env.CLARITY_ID ?? null,
+    ga4Id: env.GA4_ID ?? null,
+    clarityId: env.CLARITY_ID ?? null,
   };
 }
 
