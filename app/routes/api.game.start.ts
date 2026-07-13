@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 
+import { cloudflareContext } from "~/context";
 import { methodNotAllowed, jsonResponse, readJson } from "~/shared/http";
 import { startGameRequestSchema } from "~/shared/schemas";
 import { GameService } from "~/server/services/game.service";
@@ -25,10 +26,8 @@ export async function action({
       );
     }
 
-    const result = await new GameService(context.cloudflare.env).start(
-      request,
-      parsed.data,
-    );
+    const { env } = context.get(cloudflareContext);
+    const result = await new GameService(env).start(request, parsed.data);
     const headers = new Headers();
     if (result.setCookie) {
       headers.append("Set-Cookie", result.setCookie);
