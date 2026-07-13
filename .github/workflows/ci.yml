@@ -26,10 +26,16 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --silent
 
       - name: Lint
-        run: npm run lint
+        shell: bash
+        run: |
+          set +e
+          npm run lint > /tmp/lint.log 2>&1
+          status=$?
+          tail -n 100 /tmp/lint.log
+          exit $status
 
       - name: Typecheck
         run: npm run typecheck
