@@ -1,5 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 
+import { cloudflareContext } from "~/context";
 import { methodNotAllowed, jsonResponse, readJson } from "~/shared/http";
 import { endGameRequestSchema } from "~/shared/schemas";
 import { GameService } from "~/server/services/game.service";
@@ -25,7 +26,8 @@ export async function action({
       );
     }
 
-    const result = await new GameService(context.cloudflare.env).end(
+    const { env } = context.get(cloudflareContext);
+    const result = await new GameService(env).end(
       parsed.data.sessionId,
       parsed.data.reason,
     );

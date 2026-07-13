@@ -14,7 +14,7 @@ export const guessRequestSchema = z.object({
     .trim()
     .min(1)
     .max(MAX_NAME_LENGTH)
-    .refine((value) => !/[\u0000-\u001F\u007F]/u.test(value), {
+    .refine((value) => !containsControlCharacter(value), {
       message: "Control characters are not allowed.",
     }),
 });
@@ -27,3 +27,10 @@ export const endGameRequestSchema = z.object({
 export type StartGameRequest = z.infer<typeof startGameRequestSchema>;
 export type GuessRequest = z.infer<typeof guessRequestSchema>;
 export type EndGameRequest = z.infer<typeof endGameRequestSchema>;
+
+function containsControlCharacter(value: string): boolean {
+  return Array.from(value).some((character) => {
+    const codePoint = character.codePointAt(0) ?? 0;
+    return codePoint <= 31 || codePoint === 127;
+  });
+}

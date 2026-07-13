@@ -1,11 +1,9 @@
-declare module "react-router" {
-  interface AppLoadContext {
-    cloudflare: {
-      env: Env;
-      ctx: ExecutionContext;
-      cf?: IncomingRequestCfProperties;
-    };
-  }
+import { createContext } from "react-router";
+
+export interface CloudflareContextValue {
+  env: Env;
+  ctx: ExecutionContext;
+  cf?: IncomingRequestCfProperties;
 }
 
-export {};
+export const cloudflareContext = createContext<CloudflareContextValue>();
