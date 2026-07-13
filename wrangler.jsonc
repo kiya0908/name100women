@@ -34,6 +34,8 @@
 	],
 	"vars": {
 		"APP_URL": "https://name100women.top",
-		"APP_ENV": "production"
+		"APP_ENV": "production",
+		"GA4_ID": "G-LBSZ4P9D02",
+		"CLARITY_ID": "xlu6f7k2ps"
 	}
 }

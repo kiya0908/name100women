@@ -1,4 +1,2 @@
 ANONYMOUS_HASH_SALT=replace-with-a-long-random-secret
 IP_HASH_SALT=replace-with-a-different-long-random-secret
-GA4_ID=
-CLARITY_ID=
