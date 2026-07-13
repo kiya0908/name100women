@@ -28,35 +28,68 @@ jobs:
       - name: Install dependencies
         run: npm install --silent
 
+      - name: Prepare diagnostics
+        run: mkdir -p diagnostics
+
       - name: Lint
         id: lint
         shell: bash
         run: |
           set +e
-          npm run lint > lint.log 2>&1
-          status=$?
-          echo "status=$status" >> "$GITHUB_OUTPUT"
+          npm run lint > diagnostics/lint.log 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Upload lint log
+      - name: Typecheck
+        id: typecheck
+        shell: bash
+        run: |
+          set +e
+          npm run typecheck > diagnostics/typecheck.log 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Unit tests
+        id: tests
+        shell: bash
+        run: |
+          set +e
+          npm run test > diagnostics/tests.log 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: D1 migration dry run
+        id: migration
+        shell: bash
+        run: |
+          set +e
+          npm run db:migrate:local > diagnostics/migration.log 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Production build
+        id: build
+        shell: bash
+        run: |
+          set +e
+          npm run build > diagnostics/build.log 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload validation diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lint-log
-          path: lint.log
+          name: validation-diagnostics
+          path: diagnostics
 
-      - name: Enforce lint result
-        if: steps.lint.outputs.status != '0'
-        run: exit 1
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Unit tests
-        run: npm run test
-
-      - name: D1 migration dry run
-        run: npm run db:migrate:local
-
-      - name: Production build
-        run: npm run build
+      - name: Enforce validation results
+        shell: bash
+        run: |
+          if [ "${{ steps.lint.outputs.status }}" != "0" ] || \
+             [ "${{ steps.typecheck.outputs.status }}" != "0" ] || \
+             [ "${{ steps.tests.outputs.status }}" != "0" ] || \
+             [ "${{ steps.migration.outputs.status }}" != "0" ] || \
+             [ "${{ steps.build.outputs.status }}" != "0" ]; then
+            exit 1
+          fi
