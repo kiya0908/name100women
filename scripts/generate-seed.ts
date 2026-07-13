@@ -1,57 +1,13 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
-const endpoint = "https://query.wikidata.org/sparql";
+import { fetchSeedBindings } from "./wikidata-seed";
+
 const outputPath = resolve("db/seed.sql");
-
-const query = `
-SELECT ?person ?personLabel ?personDescription ?article ?sitelinks WHERE {
-  VALUES ?gender { wd:Q6581072 wd:Q1052281 wd:Q15145779 }
-  ?person wdt:P31 wd:Q5;
-          wdt:P21 ?gender;
-          wikibase:sitelinks ?sitelinks.
-  ?article schema:about ?person;
-           schema:isPartOf <https://en.wikipedia.org/>.
-  SERVICE wikibase:label {
-    bd:serviceParam wikibase:language "en".
-  }
-}
-ORDER BY DESC(?sitelinks)
-LIMIT 1000
-`;
-
-interface Binding {
-  person: { value: string };
-  personLabel: { value: string };
-  personDescription?: { value: string };
-  article: { value: string };
-}
-
-interface SparqlResponse {
-  results: {
-    bindings: Binding[];
-  };
-}
-
-const response = await fetch(
-  `${endpoint}?query=${encodeURIComponent(query)}&format=json`,
-  {
-    headers: {
-      Accept: "application/sparql-results+json",
-      "User-Agent":
-        "Name100WomenSeed/1.0 (https://name100women.top/contact; support@name100women.top)",
-    },
-  },
-);
-
-if (!response.ok) {
-  throw new Error(`Wikidata seed query failed with HTTP ${response.status}`);
-}
-
-const data = (await response.json()) as SparqlResponse;
-if (data.results.bindings.length < 500) {
+const bindings = await fetchSeedBindings();
+if (bindings.length < 500) {
   throw new Error(
-    `Expected at least 500 seed people, received ${data.results.bindings.length}`,
+    `Expected at least 500 seed people, received ${bindings.length}`,
   );
 }
 
@@ -62,7 +18,7 @@ const statements = [
   "BEGIN TRANSACTION;",
 ];
 
-for (const binding of data.results.bindings) {
+for (const binding of bindings) {
   const qid = binding.person.value.split("/").pop();
   if (!qid) continue;
 
@@ -119,7 +75,7 @@ statements.push("COMMIT;", "");
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(outputPath, statements.join("\n"), "utf8");
 console.log(
-  `Generated ${outputPath} with ${data.results.bindings.length} people.`,
+  `Generated ${outputPath} with ${bindings.length} people.`,
 );
 
 function normalize(value: string): string {

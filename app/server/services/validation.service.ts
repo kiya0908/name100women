@@ -7,8 +7,8 @@ import type {
 
 import { normalizeDisplayName } from "~/shared/normalize";
 
-import { WikipediaClient } from "../external/wikipedia.client";
-import { WikidataClient, type WikidataPerson } from "../external/wikidata.client";
+import { WikipediaClient } from "../external/wikipedia-api";
+import { WikidataClient, type WikidataPerson } from "../external/wikidata-api";
 import {
   PersonRepository,
   type PersistedPerson,
